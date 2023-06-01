@@ -31,7 +31,7 @@ namespace WpfApp2
         bool _eBClick = false;
         bool _aBClick = false;
 
-        
+        string? actionString;
         double? result = null;
         Actions action;
         bool equalButtonClick
@@ -61,22 +61,22 @@ namespace WpfApp2
 
         private void DigitButtonClick(object sender, RoutedEventArgs e)
         {
+            
             if (equalButtonClick)
             {
                 operand = null;
+                Enter.Text = "0";
                 result = null;
                 equalButtonClick = false;
-                Enter.Text = "0";
                 History.Text = string.Empty;
             }
             else if (actionButtonClick)
             {
                 operand = null;
-                actionButtonClick = false;
                 Enter.Text = "0";
+                actionButtonClick = false;
             }
-
-           
+               
             switch ((sender as Button)?.Content)
             {
                 case "<":
@@ -94,15 +94,11 @@ namespace WpfApp2
         private void ActionButton_Click(object sender, RoutedEventArgs e)
         {
             Button? button = sender as Button;
-            string? actionString = button?.Content.ToString();
+            actionString = button?.Content.ToString();
             if (result == null)
             {
                 try { result = double.Parse(Enter.Text); }
-                catch 
-                {
-                    Enter.Text = "0";
-                    result = 0;
-                }
+                catch  { return; }
                 History.AppendText(result.ToString());
                 History.AppendText(actionString);
 
@@ -131,6 +127,7 @@ namespace WpfApp2
             if (result == null) return;
             operand ??= double.Parse(Enter.Text);
             if(!Carculate(action)) return;
+            if (History.Text[^1] == '=') History.Text = History.Text[..^1] + actionString;
             History.AppendText(operand.ToString());
             History.AppendText("=");
             Enter.Text = result.ToString();
@@ -143,7 +140,11 @@ namespace WpfApp2
         {
             if (((Button)sender).Content.ToString() == "C")  Clear();
             else 
-            { }
+            {
+                operand = 0;
+                actionButtonClick = true;
+                Enter.Text = "0";
+            }
         }
 
         private bool Carculate(Actions actions)
@@ -167,7 +168,7 @@ namespace WpfApp2
             return true;
         }
 
-        private void Clear()
+        private void Clear(bool all = true)
         {
             operand = null;
             result = null;
