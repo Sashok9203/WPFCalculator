@@ -19,7 +19,7 @@ namespace WpfApp2
 {
     public partial class MainWindow : Window
     {
-        enum Actions
+        public enum Actions
         {
             Add,
             Sub,
@@ -112,10 +112,8 @@ namespace WpfApp2
                 History.AppendText(actionString);
             }
             else History.Text = History.Text[..^1] + actionString;
-
-
             clearOperand = true;
-            action = Enum.Parse<Actions>(button.Tag.ToString());
+            Enum.TryParse(button?.Tag.ToString(), out action);
 
         }
         
