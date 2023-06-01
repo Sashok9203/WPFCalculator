@@ -34,22 +34,22 @@ namespace WpfApp2
         string? actionString;
         double? result = null;
         Actions action;
-        bool equalButtonClick
+        bool clearAll
         {
             get => _eBClick;
             set
             {
                 _eBClick = value;
-                if (value) actionButtonClick = false;
+                if (value) clearOperand = false;
             }
         }
-        bool actionButtonClick
+        bool clearOperand
         {
             get => _aBClick;
             set 
             {
                 _aBClick = value;
-                if (value) equalButtonClick = false;
+                if (value) clearAll = false;
             }
         }
 
@@ -62,19 +62,19 @@ namespace WpfApp2
         private void DigitButtonClick(object sender, RoutedEventArgs e)
         {
             
-            if (equalButtonClick)
+            if (clearAll)
             {
                 operand = null;
                 Enter.Text = "0";
                 result = null;
-                equalButtonClick = false;
+                clearAll = false;
                 History.Text = string.Empty;
             }
-            else if (actionButtonClick)
+            else if (clearOperand)
             {
                 operand = null;
                 Enter.Text = "0";
-                actionButtonClick = false;
+                clearOperand = false;
             }
                
             switch ((sender as Button)?.Content)
@@ -101,9 +101,8 @@ namespace WpfApp2
                 catch  { return; }
                 History.AppendText(result.ToString());
                 History.AppendText(actionString);
-
             }
-            else if (operand == null)
+            else if (operand == null && !clearOperand)
             {
                 operand = double.Parse(Enter.Text);
                 if (!Carculate(action)) return;
@@ -115,7 +114,7 @@ namespace WpfApp2
             else History.Text = History.Text[..^1] + actionString;
 
 
-            actionButtonClick = true;
+            clearOperand = true;
             action = Enum.Parse<Actions>(button.Tag.ToString());
 
         }
@@ -123,7 +122,7 @@ namespace WpfApp2
 
         private void EqualButtonClick(object sender, RoutedEventArgs e)
         {
-            if (actionButtonClick) operand = null;
+            if (clearOperand) operand = null;
             if (result == null) return;
             operand ??= double.Parse(Enter.Text);
             if(!Carculate(action)) return;
@@ -131,7 +130,7 @@ namespace WpfApp2
             History.AppendText(operand.ToString());
             History.AppendText("=");
             Enter.Text = result.ToString();
-            equalButtonClick = true;
+            clearAll = true;
         }
 
        
@@ -142,7 +141,7 @@ namespace WpfApp2
             else 
             {
                 operand = 0;
-                actionButtonClick = true;
+                clearOperand = true;
                 Enter.Text = "0";
             }
         }
@@ -156,7 +155,7 @@ namespace WpfApp2
 
                     if (operand == 0)
                     {
-                        Clear();
+                        clearOperand = true;
                         Enter.Text = "Can not divide by zero";
                         return false;
                     }
@@ -170,12 +169,13 @@ namespace WpfApp2
 
         private void Clear(bool all = true)
         {
+            
             operand = null;
             result = null;
-            equalButtonClick = true;
+            clearAll = true;
             Enter.Text = "0";
             History.Text = string.Empty;
-            actionButtonClick = false;
+           
         }
     }
 }
